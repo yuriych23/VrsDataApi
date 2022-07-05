@@ -43,6 +43,7 @@ public class VrsLogRepository : IVrsLogRepository
     {
         var vrsLogEntry = await GetVrsLogEntryAsync(item.Id);
 
+        vrsLogEntry.VesselName = item.VesselName;
         vrsLogEntry.Position = item.Position;
         vrsLogEntry.Date = DateTime.UtcNow;
 
