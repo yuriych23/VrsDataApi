@@ -47,7 +47,7 @@ public class VrsLogEntriesController : ControllerBase
         return vrsLogEntry;
     }
 
-    [HttpPut("{id}")]
+    [HttpPut]
     public async Task<IResult> PutVrsLogEntry(VrsLogEntry entry)
     {
         var vrsLogEntry = await _vrsLogRepository.GetVrsLogEntryAsync(entry.Id);
@@ -56,7 +56,7 @@ public class VrsLogEntriesController : ControllerBase
             return Results.NotFound();
         }
 
-        await _vrsLogRepository.UpdateVrsLogEntryAsync(vrsLogEntry);
+        await _vrsLogRepository.UpdateVrsLogEntryAsync(entry);
 
         return Results.NoContent();
     }
