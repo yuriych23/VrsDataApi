@@ -39,8 +39,13 @@ public class VrsLogRepository : IVrsLogRepository
         return await _dbContext.VrsLogEntries.FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public Task UpdateVrsLogEntryAsync(Guid id, VrsLogEntry item)
+    public async Task UpdateVrsLogEntryAsync(VrsLogEntry item)
     {
-        throw new NotImplementedException();
+        var vrsLogEntry = await GetVrsLogEntryAsync(item.Id);
+
+        vrsLogEntry.Position = item.Position;
+        vrsLogEntry.Date = DateTime.UtcNow;
+
+        await _dbContext.SaveChangesAsync();
     }
 }

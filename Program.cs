@@ -4,7 +4,20 @@ using Microsoft.EntityFrameworkCore;
 using VrsDataApi.DAL.Concrete;
 using VrsDataApi.DAL.Abstract;
 
+var  MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy  =>
+                      {
+                          policy.WithOrigins(
+                            "http://localhost:8080",
+                            "https://icy-dune-02041e603.1.azurestaticapps.net/");
+                      });
+});
 
 var secretClient = new SecretClient(new Uri("https://vrs-data.vault.azure.net/"), new DefaultAzureCredential());
 KeyVaultSecret secret = secretClient.GetSecret("CosmosPK");
@@ -26,6 +39,8 @@ builder.Services.AddControllers();
 var app = builder.Build();
 
 app.UseHttpsRedirection();
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.MapControllers();
 

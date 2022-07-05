@@ -1,54 +1,77 @@
 using Microsoft.AspNetCore.Mvc;
 using VrsDataApi.DAL.Abstract;
 using Newtonsoft.Json;
+using VrsDataApi.Models;
 
 namespace VrsDataApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class VrsLogController : ControllerBase
+public class VrsLogEntriesController : ControllerBase
 {
     private readonly IVrsLogRepository _vrsLogRepository;
-    private readonly ILogger<HelloController> _logger;
+    private readonly ILogger<VrsLogEntriesController> _logger;
 
-    public VrsLogController(ILogger<HelloController> logger, IVrsLogRepository vrsLogRepository)
+    public VrsLogEntriesController(ILogger<VrsLogEntriesController> logger, IVrsLogRepository vrsLogRepository)
     {
         _logger = logger;
         _vrsLogRepository = vrsLogRepository;
     }
 
     [HttpGet]
-    public async Task<string> Get()
+    public async Task<IEnumerable<VrsLogEntry>> GetVrsLogEntries()
     {
-        // var entry = new VrsLogEntry()
-        // {
-        //     Id = Guid.NewGuid(),
-        //     ImoNumber = 1234567,
-        //     Date = DateTime.UtcNow,
-        //     VesselName = "DreamMary",
-        //     Position = new Position
-        //     {
-        //         Latitude = 23.234235,
-        //         Longitude = 45.9823
-        //     }
-        // };
-
-        var entry = await _vrsLogRepository.GetVrsLogEntriesAsync();
-
-        return JsonConvert.SerializeObject(entry);
+        return await _vrsLogRepository.GetVrsLogEntriesAsync();
     }
 
     [HttpGet("{id}")]
-    public async Task<string> Get(Guid id)
+    public async Task<VrsLogEntry> GetVrsLogEntry(Guid id)
     {
-        var entry = await _vrsLogRepository.GetVrsLogEntryAsync(id);
+       return await _vrsLogRepository.GetVrsLogEntryAsync(id);
+    }
 
-        return JsonConvert.SerializeObject(entry);
+    [HttpPost]
+    public async Task<VrsLogEntry> PostVrsLogEntry(VrsLogEntry entry)
+    {
+        var vrsLogEntry = new VrsLogEntry()
+        {
+            Id = Guid.NewGuid(),
+            ImoNumber = entry.ImoNumber,
+            Date = DateTime.UtcNow,
+            VesselName = entry.VesselName,
+            Position = entry.Position
+        };
+
+        await _vrsLogRepository.AddVrsLogEntryAsync(vrsLogEntry);
+
+        return vrsLogEntry;
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IResult> PutVrsLogEntry(VrsLogEntry entry)
+    {
+        var vrsLogEntry = await _vrsLogRepository.GetVrsLogEntryAsync(entry.Id);
+        if (vrsLogEntry == null)
+        {
+            return Results.NotFound();
+        }
+
+        await _vrsLogRepository.UpdateVrsLogEntryAsync(vrsLogEntry);
+
+        return Results.NoContent();
     }
 
     [HttpDelete("{id}")]
-    public async Task Delete(Guid id)
+    public async Task<IResult> DeleteVrsLogEntry(Guid id)
     {
+        var vrsLogEntry = await _vrsLogRepository.GetVrsLogEntryAsync(id);
+        if (vrsLogEntry == null)
+        {
+            return Results.NotFound();
+        }
+
         await _vrsLogRepository.DeleteVrsLogEntryAsync(id);
+
+        return Results.NoContent();
     }
 }
