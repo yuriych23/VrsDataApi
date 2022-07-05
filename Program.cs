@@ -16,7 +16,8 @@ builder.Services.AddCors(options =>
                           policy.WithOrigins(
                             "http://localhost:8080",
                             "https://icy-dune-02041e603.1.azurestaticapps.net")
-                            .WithMethods("GET", "POST", "DELETE", "PUT");
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
                       });
 });
 
