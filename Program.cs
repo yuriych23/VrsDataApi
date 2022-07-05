@@ -4,14 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using VrsDataApi.DAL.Concrete;
 using VrsDataApi.DAL.Abstract;
 
-var  MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy  =>
+                      policy =>
                       {
                           policy.WithOrigins(
                             "http://localhost:8080",
@@ -28,7 +28,8 @@ builder.Services.AddDbContext<VrsDataApi.DAL.VrsDataDbContext>(
         options => options.UseCosmos(
             "https://vrs-data-db.documents.azure.com:443/",
             secret.Value,
-            "VrsLogDb", o => {
+            "VrsLogDb", o =>
+            {
                 o.MaxRequestsPerTcpConnection(3);
                 o.MaxTcpConnectionsPerEndpoint(3);
                 o.RequestTimeout(TimeSpan.FromSeconds(10));
@@ -38,7 +39,13 @@ builder.Services.AddScoped<IVrsLogRepository, VrsLogRepository>();
 
 builder.Services.AddControllers();
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
